@@ -8,14 +8,14 @@ RUN apt-get update \
 
 # init
 ENV TINI_VERSION v0.13.1
-run curl -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" \
- && curl -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc" \
+run curl -L -o /tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" \
+ && curl -L -o /tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc" \
  && gpg \
       --keyserver ha.pool.sks-keyservers.net \
       --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
- && gpg --verify /tini.asc \
- && rm tini.asc \
- && chmod +x tini
+ && gpg --verify /tini.asc /tini \
+ && rm /tini.asc \
+ && chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 
 # gqrx
