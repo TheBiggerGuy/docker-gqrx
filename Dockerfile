@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER Guy Taylor <thebigguy.co.uk@gmail.com>
 
-# TOOD: DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Build reqirments
 ENV BUILD_PACKAGES "software-properties-common curl"
