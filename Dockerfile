@@ -1,6 +1,8 @@
 FROM ubuntu:16.04
 MAINTAINER Guy Taylor <thebigguy.co.uk@gmail.com>
 
+# TOOD: DEBIAN_FRONTEND=noninteractive
+
 # Build reqirments
 ENV BUILD_PACKAGES "software-properties-common curl"
 RUN apt-get update \
@@ -24,11 +26,28 @@ RUN add-apt-repository --yes ppa:ettusresearch/uhd \
  && add-apt-repository --yes ppa:myriadrf/gnuradio \
  && add-apt-repository --yes ppa:gqrx/gqrx-sdr \
  && apt-get update \
- && apt-get install --yes libvolk1-bin gqrx-sdr
+ && apt-get install --yes libvolk1-bin gqrx-sdr libhackrf0
 
 # clean up
-RUN apt-get purge --yes curl "${BUILD_PACKAGES}" \
+RUN echo "${BUILD_PACKAGES}" | xargs apt-get purge --yes \
+ && apt-get autoremove --purge --yes \
  && rm -rf /var/lib/apt/lists/*
+
+# Set up the user
+RUN export UNAME=gqrx UID=1000 GID=1000 && \
+    mkdir -p "/home/${UNAME}" && \
+    echo "${UNAME}:x:${UID}:${GID}:${UNAME} User,,,:/home/${UNAME}:/bin/bash" >> /etc/passwd && \
+    echo "${UNAME}:x:${UID}:" >> /etc/group && \
+    mkdir -p /etc/sudoers.d && \
+    echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${UNAME} && \
+    chmod 0440 /etc/sudoers.d/${UNAME} && \
+    chown ${UID}:${GID} -R /home/${UNAME} && \
+    gpasswd --add ${UNAME} audio 
+
+COPY pulse-client.conf /etc/pulse/client.conf
+
+USER gqrx
+ENV HOME /home/gqrx
 
 # run
 CMD ["gqrx"]
