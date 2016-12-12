@@ -39,20 +39,20 @@ RUN echo "${BUILD_PACKAGES}" | xargs apt-get purge --yes \
 COPY pulse-client.conf /etc/pulse/client.conf
 
 # Set up the user
-ARG UNAME=gqrx \
-    UID=1000 \
-    GID=1000 \
-    HOME=/home/$UNAME
-RUN mkdir -p $HOME && \
-    echo "$UNAME:x:$UID:$GID:$UNAME User,,,:$HOME:/bin/bash" >> /etc/passwd && \
-    echo "$UNAME:x:$UID:" >> /etc/group && \
+ARG UNAME=gqrx
+ARG UID=1000
+ARG GID=1000
+ARG HOME=/home/${UNAME}
+RUN mkdir -p ${HOME} && \
+    echo "${UNAME}:x:${UID}:${GID}:${UNAME} User,,,:${HOME}:/bin/bash" >> /etc/passwd && \
+    echo "${UNAME}:x:${UID}:" >> /etc/group && \
     mkdir -p /etc/sudoers.d && \
-    echo "$UNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$UNAME && \
-    chmod 0440 /etc/sudoers.d/$UNAME && \
-    chown $UID:$GID -R $HOME && \
-    gpasswd --add $UNAME audio 
-USER UNAME
-ENV HOME $HOME
+    echo "${UNAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${UNAME} && \
+    chmod 0440 /etc/sudoers.d/${UNAME} && \
+    chown ${UID}:${GID} -R ${HOME} && \
+    gpasswd --add ${UNAME} audio
+USER ${UNAME}
+ENV HOME=${HOME}
 
 # run
 CMD ["gqrx"]
